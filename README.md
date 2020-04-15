@@ -18,6 +18,10 @@ Filtered|
 :------------------------:|
 ![](https://user-images.githubusercontent.com/23034890/79316869-4193f100-7f05-11ea-9405-a23f88056031.png)
 
+Product page|
+:------------------------:|
+![](https://user-images.githubusercontent.com/23034890/79316880-43f64b00-7f05-11ea-8b04-f6820d6676ed.png)
+
 Checkout             |  Author's Page
 :-------------------------:|:-------------------------:
 ![](https://user-images.githubusercontent.com/23034890/79316891-45c00e80-7f05-11ea-8adb-35f9972d5139.png)  |  ![](https://user-images.githubusercontent.com/23034890/79316897-48226880-7f05-11ea-8144-bd085837bf63.png)
