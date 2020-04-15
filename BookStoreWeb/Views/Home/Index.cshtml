@@ -1,0 +1,146 @@
+﻿@{
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+    
+}
+@model BookStoreWeb.Models.FilterBooks
+
+    <div class="container-fluid" style="margin-top:40px">
+        @if (ViewBag.Title != "" && ViewBag.Title!=null)
+        {
+        <div class="col-md-12 h4 text-dark text-center">
+            @ViewBag.Title
+        </div>
+        }
+        <div class="row">
+            <div class="col-sm-2 text-center">
+                @using (Html.BeginForm())
+                {
+                <h4>Filter</h4>
+                <hr>
+                <div calss="container" style="margin:10px">
+                    Price
+                    <input type="range" name="price" onchange="onPriceChanged(this.value)" class="custom-range" value="@Model.Price" min="1" max="49" id="priceRange">
+                    <label id="price">1 - @Model.Price $</label>
+                </div>
+                <div calss="card container">
+                    <div class="card-header" role="tab" id="genre_header">
+                        <a class="text-success" style="text-decoration:none;" role="button" data-toggle="collapse" data-parent="#accordianId" href="#genre_section" aria-expanded="true" aria-controls="genre_section">
+                            Genre
+                        </a>
+                    </div>
+                    <div class="collapse show" role="tabpanel" aria-labelledby="genre_header" id="genre_section">
+                        <div class="card-body">
+
+                            @if (Model.Countries != null && Model.Countries.Count() > 0)
+                            {
+                                <div class="form-check text-left">
+                                    @Html.EditorFor(m => m.Genres)
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <hr>
+                <div id="accordianId" role="tablist" aria-multiselectable="true"><!--wrap from here-->
+                    <div calss="card container" >
+                        <div class="card-header" role="tab" id="country_header">
+                            <a class="text-success" style="text-decoration:none;" role="button" data-toggle="collapse" data-parent="#accordianId" href="#country_section" aria-expanded="true" aria-controls="country_section">
+                                Country
+                            </a>
+                        </div>
+                        <div class="collapse in" role="tabpanel" aria-labelledby="country_header" id="country_section" >
+                            <div class="card-body" >
+
+                                @if (Model.Countries != null && Model.Countries.Count() > 0)
+                                {
+                                    <div class="form-check text-left">
+                                        @Html.EditorFor(m => m.Countries)
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                   
+                    <hr>
+                    <div calss="card container">
+                        <div class="card-header" role="tab" id="language_header">
+                            <a class="text-success" style="text-decoration:none;" role="button" data-toggle="collapse" data-parent="#accordianId" href="#language_section" aria-expanded="true" aria-controls="language_section">
+                                Language
+                            </a>
+                        </div>
+                        <div class="collapse in" role="tabpanel" aria-labelledby="language_header" id="language_section">
+                            <div class="card-body">
+
+                                @if (Model.Countries != null && Model.Countries.Count() > 0)
+                                {
+                                    <div class="form-check text-left">
+                                        @Html.EditorFor(m => m.Languages)
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <button type="submit" class="btn btn-primary mb-5">Apply</button>
+                }
+            </div>
+            <div class="col col-lg-9 ">
+                <div class="row text-center" style="display:flex; flex-wrap:wrap; padding:0px 4px">
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") )
+                    { 
+                    <div class="col-lg-12 text-right">
+                        @Html.ActionLink(linkText:"Add Book", actionName:"Add", controllerName: "Product",routeValues: null, htmlAttributes: new { @class="btn btn-success"})
+                    </div>
+                    }
+                    @foreach (var item in ViewBag.Books)
+                    {
+                        <div class="col-sm-2 book bg-light my-4 mx-2">
+                            <a href="@Url.Action("Book","Product",new {id=item.Id })">
+                                <img src="~/Static/Images/@item.ImgUrl">
+                            </a>
+                                <h4>@item.Price $</h4>
+                              
+                                @Html.ActionLink((string)item.Title+" ("+(string)item.Language.Substring(0,3).ToUpper()+")",actionName:"Book",controllerName:"Product", routeValues:new {id=item.Id },htmlAttributes: null)
+                               
+                            <div class="row align-items-center justify-content-center mb-3">
+                            @for (int i = 0; i < item.Rating; i++)
+                            {
+                                <div class="col-md-2 ">
+                                    <img src="~/Static/Images/Star.png">
+                                </div>
+                            }
+
+                            @{ var difference = 5 - item.Rating;}
+                            @if (difference > 0)
+                            {
+                                for (int i = 0; i < difference; i++)
+                                {
+                                    <div class="col-md-2">
+                                        <img src="~/Static/Images/Star_Empty.png">
+                                    </div>
+                                }
+                            }
+                        </div>
+                    
+                        </div>
+                    }
+
+                </div>
+                <div class="col-lg-12 text-center">
+                    <button type="button" class="btn btn-primary mb-5">Load more</button>
+                </div>
+            </div>
+            
+        </div>
+       
+    </div>
+<script>
+    function onPriceChanged(price) {
+        document.getElementById('price').innerHTML = "1 - " + price + " $"
+    }
+</script>

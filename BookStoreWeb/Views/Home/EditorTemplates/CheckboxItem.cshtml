@@ -1,0 +1,8 @@
+﻿@model BookStoreWeb.Models.CheckboxItem
+    <p>
+
+        @Html.CheckBoxFor(x => x.IsSelected)
+        @Model.Name
+        @Html.HiddenFor(x => x.Id)
+    </p>
+

@@ -1,0 +1,147 @@
+﻿
+@{
+    ViewBag.Title = "Info";
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+    ViewBag.country = new SelectList
+       (
+
+       System.Globalization.CultureInfo.GetCultures(System.Globalization.CultureTypes.SpecificCultures)
+               .Select(x => new System.Globalization.RegionInfo(x.LCID).EnglishName)
+               .Distinct()
+               .OrderBy(x => x).ToList()
+   , null);
+}
+@model BookStoreWeb.Models.Author
+@using (Html.BeginForm("Edit", "Author", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = " alert alert-danger" })
+    <div class="container-fluid row my-4">
+        <div class="col-lg-2">
+            <div class="input-group mb-3 px-2 py-2 rounded-pill bg-gray shadow-sm">
+                <input id="upload" type="file" style="opacity:0;" name="image" formmethod="post" onchange="readURL(this);" class="form-control border-0">
+                <label id="upload-label" for="upload" class="font-weight-light text-muted my-auto mx-auto">Upload Image</label>
+                <div class="input-group-append text-center">
+                    <label for="upload" class="btn btn-light m-0 rounded-pill px-4"> <i class="fa fa-cloud-upload mr-2 text-muted"></i><small class="text-uppercase font-weight-bold text-muted">Choose file</small></label>
+                </div>
+            </div>
+
+            <!-- Uploaded image area-->
+            <p class="font-italic text-secondary text-center">Uploaded image is shown below.</p>
+            <div class="image-area mt-4 my-auto"><img id="imageResult" src="~/Static/Images/@Model.ImgUrl" alt="" class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+        </div>
+        <div class="col-lg-2">
+            <div class="row">
+
+                <div class="col-lg-12 my-2 h5">
+                    @Html.TextBoxFor(x => x.Author_Name, new { @class = "form-control", @value = Model.Author_Name, @readonly = "readonly" })
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-lg-12 my-2 h5">
+                    @Html.DropDownList("country", ViewBag.country as SelectList, htmlAttributes: new { @class = "form-control", @value = Model.Country })
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-lg-7">
+            @Html.TextAreaFor(x => x.Biography, new { @class = "form-control", @value = Model.Biography })
+        </div>
+
+        <div class="col-lg-1">
+            <button type="submit" class="btn btn-success btn-block">Save</button>
+        </div>
+
+
+    </div>
+}
+<div class="container-fluid">
+    <div id="accordianId" role="tablist" aria-multiselectable="true">
+        <div class="card">
+            <div class="card-header" role="tab" id="section1HeaderId">
+                <h5 class="mb-0">
+                    <a class="text-dark" data-toggle="collapse" data-parent="#accordianId" href="#section1ContentId" aria-expanded="true" aria-controls="section1ContentId">
+                        Available Books
+                    </a>
+                </h5>
+            </div>
+            <div id="section1ContentId" class="collapse show" role="tabpanel" aria-labelledby="section1HeaderId">
+                <div class="card-body">
+                    <div class="container bg-light">
+                        @foreach (var item in Model.Books)
+                        {
+                            <div class="col-sm-3 book bg-light my-8 text-center">
+                                <a href="@Url.Action("Book","Product",new {id=item.Id })">
+                                    <img src="~/Static/Images/@item.ImgUrl">
+                                </a>
+                                <h4 class="text-center">@item.Price $</h4>
+
+                                @Html.ActionLink((string)item.Title, actionName: "Book", controllerName: "Product", routeValues: new { id = item.Id }, htmlAttributes: null)
+
+                                <div class="row align-items-center justify-content-center mb-3">
+                                    @for (int i = 0; i < item.Rating; i++)
+                                    {
+                                        <div class="col-md-2 ">
+                                            <img src="~/Static/Images/Star.png">
+                                        </div>
+                                    }
+
+                                    @{ var difference = 5 - item.Rating;}
+                                    @if (difference > 0)
+                                    {
+                                        for (int i = 0; i < difference; i++)
+                                        {
+                                            <div class="col-md-2">
+                                                <img src="~/Static/Images/Star_Empty.png">
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#imageResult')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(function () {
+            $('#upload').on('change', function () {
+                readURL(input);
+            });
+        });
+
+        /*  ==========================================
+            SHOW UPLOADED IMAGE NAME
+        * ========================================== */
+        var input = document.getElementById('upload');
+        var infoArea = document.getElementById('upload-label');
+
+        input.addEventListener('change', showFileName);
+        function showFileName(event) {
+            var input = event.srcElement;
+            var fileName = input.files[0].name;
+            infoArea.textContent = 'File name: ' + fileName;
+        }
+    </script>
+}
+

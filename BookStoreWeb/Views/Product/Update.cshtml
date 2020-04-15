@@ -1,0 +1,25 @@
+﻿@Model Book
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+    <div>
+    <form method="post">
+        <label>Title</label><input name="title" type="text" value=@Model.Title />
+        <label>Rating</label><input name="rating" type="number" value="=@Model.Rating"/>
+        <label>Price</label><input name="price" type="number"/>
+        <label>Description</label><input name="description"/>
+        <label>Language</label><input name="language"/>
+        <label>Author</label><input name="author_name" />
+        <label>Author Country</label><input name="country" />
+        <label>Publisher</label><input name="publisher_name" />
+        <input type="submit" />
+    </form>
+    </div>
+</body>
+</html>

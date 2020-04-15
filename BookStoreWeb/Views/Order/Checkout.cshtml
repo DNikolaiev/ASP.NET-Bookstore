@@ -1,0 +1,64 @@
+﻿
+
+@model IEnumerable<BookStoreWeb.Models.Order>
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+    float sum = 0;
+}
+    <div class="container text-center my-4">
+        <div class="col-md-12">
+            <h3 class="text-success">@ViewBag.Title</h3>
+        </div>
+        @if (Model.Count() == 0)
+        {
+            <div class="col-md-12 my-4 mx-auto h5">
+                Nothing here yet!
+            </div>
+        }
+        @foreach (var order in Model)
+        {
+            sum += order.Book.Price;
+            <div class="row my-4">
+                <div class="col-md-3">
+                    <a href="@Url.Action("Book","Product",new {id=order.Book.Id })">
+                        <img style="width:50%" src="~/Static/Images/@order.Book.ImgUrl" />
+                    </a>
+                </div>
+                <div class="col-md-3 my-auto ">
+                    <a class="text-dark"style="text-decoration:none" href="@Url.Action("Book","Product",new {id=order.Book.Id })">
+                        <span class="h5 ">@order.Book.Title</span>
+                    </a>
+                </div>
+                <div class="col-md-3 my-auto">
+                    <span class="h5">$@order.Book.Price</span>
+                </div>
+                <div class="col-md-3 my-auto">
+                    @using (Html.BeginForm("DeleteOrder", "Order",  new { id = order.Order_Id }, FormMethod.Post))
+                    {
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                    }
+                </div>
+            </div>
+            <hr />
+        }
+        <div class="col-md-12 text-right">
+            <span class="h4">Total: $@sum</span>
+
+        </div>
+        <hr />
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 text-left">
+                    @Html.ActionLink("< Continue Shopping", "Products", "Home", null, new { @class = "btn btn-primary" })
+                </div>
+                @if (Model.Count() > 0)
+                {
+                <div class="col-md-6 text-right">
+                    @Html.ActionLink("Proceed with Payment >", "Pay", "Order", null, new { @class = "btn btn-success" })
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+

@@ -1,0 +1,198 @@
+﻿@model BookStoreWeb.Models.AddBookModel
+@{
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+    ViewBag.selected_country = new SelectList
+        (
+
+        System.Globalization.CultureInfo.GetCultures(System.Globalization.CultureTypes.SpecificCultures)
+                .Select(x => new System.Globalization.RegionInfo(x.LCID).EnglishName)
+                .Distinct()
+                .OrderBy(x => x).ToList()
+    , null);
+    string form_action = "";
+    object r_actions = null;
+}
+<link rel="stylesheet" href="~/Content/AddStyles.css" />
+@if (ViewBag.Title.Contains("Update"))
+{
+    form_action = "Update";
+
+}
+else
+{
+    form_action = "Add";
+}
+@using (Html.BeginForm(form_action, "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="container text-center text-success mt-4">
+        <h4>@ViewBag.Title</h4>
+        <hr />
+    </div>
+    <div class="container my-4">
+        <input type="hidden" value="@Model.book.Id" name="id" />
+        <div class="row my-4 ">
+            <div class="col-lg-12 text-center">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-gray shadow-sm">
+                            <input id="upload" type="file" name="image" formmethod="post" onchange="readURL(this);" class="form-control border-0">
+                            <label id="upload-label" for="upload" class="font-weight-light text-muted">Upload Image</label>
+                            <div class="input-group-append">
+                                <label for="upload" class="btn btn-light m-0 rounded-pill px-4"> <i class="fa fa-cloud-upload mr-2 text-muted"></i><small class="text-uppercase font-weight-bold text-muted">Choose file</small></label>
+                            </div>
+                        </div>
+
+                        <!-- Uploaded image area-->
+                        <p class="font-italic text-secondary text-center">Uploaded image is shown below.</p>
+                        <div class="image-area mt-4 my-auto"><img id="imageResult" src="~/Static/Images/@Model.book.ImgUrl" alt="" class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-gray shadow-sm">
+                            <input id="file" style="opacity:0;" type="file" name="file" formmethod="post" class="form-control border-0 " />
+                            <label id="upload-label" for="file" class="font-weight-light text-muted">Upload File</label>
+                            <div class="input-group-append">
+                                <label for="file" class="btn btn-light m-0 rounded-pill px-4"> <i class="fa fa-cloud-upload mr-2 text-muted"></i><small class="text-uppercase font-weight-bold text-muted">Choose file</small></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row  my-4">
+            <div class="col-lg-12 text-center">
+                <div class="row">
+                    <div class="form-group col-lg-6">
+                        <label for="">Book's Title</label>
+                        <input type="text"
+                               class="form-control" name="title" id="" aria-describedby="helpId" value="@Model.book.Title">
+                        @Html.ValidationMessageFor(model => model.book.Title, "", htmlAttributes: new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="form-group col-lg-6">
+                        <label for="">Genre</label>
+                        @Html.DropDownList("genre", new SelectList(Model.genres) as SelectList, Model.book.Genre, htmlAttributes: new { @class = "form-control col-lg-12" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 text-center">
+                <div class="row  my-4">
+                    <div class="form-group col-lg-6">
+                        <label for="">Price</label>
+                        <input type="text"
+                               class="form-control" name="price" id="" placeholder="1 $" value="@Model.book.Price">
+                        @Html.ValidationMessageFor(model => model.book.Price, "", htmlAttributes: new { @class = "text-danger" })
+
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="">Main Language used in Book</label>
+                        @Html.DropDownList("language", new SelectList(Model.languages) as SelectList, Model.book.Language, htmlAttributes: new { @class = "form-control col-lg-12" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center  my-4">
+                <label for="customRange2">Rating</label>
+                <div class="row ">
+                    <div class="col-lg-1">
+                        <h5>1</h5>
+                    </div>
+                    <div class="col-lg-10 form-inline">
+                        <input type="range" class="custom-range" min="1" max="5" value="@Model.book.Rating" id="rating" name="rating" />
+                    </div>
+                    <div class="col-lg-1">
+                        <h5>5</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center  my-4">
+                <div class="col-lg-12 text-center">
+                    @Html.LabelFor(model => model.book.Description)
+                </div>
+                <textarea rows="5" cols="125"
+                          class="form-control" name="description">@Model.book.Description
+                </textarea>
+                @Html.ValidationMessageFor(model => model.book.Description, "", htmlAttributes: new { @class = "text-danger" })
+            </div>
+
+
+            <div class="col-lg-12 text-center  my-4 ">
+                <hr />
+                <div class="row ">
+                    <div class="col-lg-12 text-secondary  my-auto"><h6>Author's Information</h6></div>
+                    <div class="form-group col-lg-6">
+                        @Html.LabelFor(model => model.book.Author_Name_fk)
+                        <input type="text"
+                               class="form-control" value="@Model.book.Author_Name_fk" name="author_name" id="" aria-describedby="helpId" placeholder="">
+                        @Html.ValidationMessageFor(model => model.book.Author.Author_Name, "", htmlAttributes: new { @class = "text-danger" })
+
+                    </div>
+                    <div class="form-group col-lg-6 ">
+                        <label for="">Author's Origin</label>
+                        @Html.DropDownList("country", ViewBag.selected_country as SelectList, Model.book.Author == null ? "" : Model.book.Author.Country, htmlAttributes: new { @class = "form-control col-lg-12" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-12 text-center  my-4">
+                <hr />
+                <div class="row">
+                    <div class="col-lg-12 text-secondary"><h6>Publisher</h6></div>
+                    <div class="form-group col-lg-12">
+                        @{var pub_name = Model.book.Publisher == null ? "" : Model.book.Publisher.Publisher_Name;}
+                        <input type="text"
+                               class="form-control text-secondary" name="publisher_name" value="@pub_name" id="" aria-describedby="helpId" placeholder="Google">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-12 text-center  my-4">
+                <button type="submit" class="btn btn-success col-lg-12">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#imageResult')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(function () {
+            $('#upload').on('change', function () {
+                readURL(input);
+            });
+        });
+
+        /*  ==========================================
+            SHOW UPLOADED IMAGE NAME
+        * ========================================== */
+        var input = document.getElementById('upload');
+        var infoArea = document.getElementById('upload-label');
+
+        input.addEventListener('change', showFileName);
+        function showFileName(event) {
+            var input = event.srcElement;
+            var fileName = input.files[0].name;
+            infoArea.textContent = 'File name: ' + fileName;
+        }
+    </script>
+    
+}
+

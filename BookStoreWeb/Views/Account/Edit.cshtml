@@ -1,0 +1,194 @@
+﻿
+@{
+    ViewBag.Title = "Account";
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+    ViewBag.country = new SelectList
+        (
+
+        System.Globalization.CultureInfo.GetCultures(System.Globalization.CultureTypes.SpecificCultures)
+                .Select(x => new System.Globalization.RegionInfo(x.LCID).EnglishName)
+                .Distinct()
+                .OrderBy(x => x).ToList()
+    , null);
+}
+@model BookStoreWeb.Models.ProfileModel
+
+    <div class="container-fluid text-center my-3">
+        @using (Html.BeginForm("Edit","Account",FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <h2 class="text-success">@ViewBag.Title</h2>
+            <div class="col-lg-12">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger" })
+            </div>
+            <div class="container-fluid my-3 p-3">
+                <div class="row">
+                    <div class="col-lg-1">
+                        <img src="~/Static/Images/User.png" />
+                    </div>
+                    <div class="col-lg-2 text-left">
+                        <div class="row my-3">
+                            <div class="col-lg-12">
+                                Name:
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-lg-12">
+                                Email:
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-lg-12">
+                                Age:
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-lg-12">
+                                Country:
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-2 text-left">
+                        <div class="row my-1">
+                            <div class="col-lg-12">
+                                @Html.TextBoxFor(model => model.User.UserName, new { @class = "form-control", @readonly = "readonly" })
+                                @Html.ValidationMessageFor(model => model.User.UserName, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-lg-12">
+                                @Html.HiddenFor(model => model.User.Password, new { @class = "form-control", @readonly = "readonly" })
+                               
+                            </div>
+                        </div>
+                        <div class="row my-1 ">
+                            <div class="col-lg-12">
+                                @Html.TextBoxFor(model => model.User.Email, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.User.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row my-1">
+                            <div class="col-lg-12">
+                                @Html.TextBoxFor(model => model.User.Age, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.User.Age, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row my-1">
+                            <div class="col-lg-12">
+                                @Html.DropDownList("country", ViewBag.country as SelectList, htmlAttributes:new {@class="form-control" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-7 text-right my-auto d-flex flex-row-reverse  ">
+                        <div class="col-lg-3 my-auto">
+                            <button type="submit" class="btn btn-success btn-block">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+            <ul class="nav nav-tabs my-4" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="library-tab" data-toggle="tab" href="#library" role="tab" aria-controls="library" aria-selected="true">Library</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="false">Transactions</a>
+                </li>
+
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="library" role="tabpanel" aria-labelledby="library-tab">
+                    <div class="container text-left">
+
+                        @foreach (var book in Model.Library)
+                        {
+
+                            <div class="row p-2 my-3 mx-auto">
+
+                                <div class="col-md-1 my-auto" id="img_@book.Id">
+                                    <a href="@Url.Action("Book","Product",new {id=book.Id })">
+                                        <img src="~/Static/Images/@book.ImgUrl" />
+                                    </a>
+                                </div>
+                                <div class="col-md-8 text-center my-auto ">
+                                    <a class="btn" data-toggle="collapse" href="#collapse_@book.Id" role="button" aria-expanded="false" aria-controls="collapse_@book.Id">
+                                        <div class="row">
+                                            <div class="col-md-12 my-auto">
+                                                <span class="h5">@book.Title</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="row mx-auto my-3 collapse" id="collapse_@book.Id">
+                                        <!--hide from here-->
+                                        <div class="col-md-6">
+
+                                            <div class="row">
+
+                                                <div class="col-md-12 text-left">
+                                                    <span class="font-italic">Author: @book.Author_Name_fk</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 text-left">
+                                                    <span class="font-italic">Language: @book.Language</span>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 text-left">
+                                                    <span class="font-italic">Genre: @book.Genre</span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="row align-items-center justify-content-center my-auto">
+                                                @for (int i = 0; i < book.Rating; i++)
+                                                {
+                                                    <div class="col-md-2">
+                                                        <img src="~/Static/Images/Star.png">
+                                                    </div>
+                                                }
+
+                                                @{ var difference = 5 - book.Rating;}
+                                                @if (difference > 0)
+                                                {
+                                                    for (int i = 0; i < difference; i++)
+                                                    {
+                                                        <div class="col-md-2">
+                                                            <img src="~/Static/Images/Star_Empty.png">
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-2 my-auto">
+                                    @Html.ActionLink("Download", "Download", "Account", routeValues: new { fileName = book.fileUrl }, htmlAttributes: new { @class = "btn btn-primary" })
+
+                                </div>
+
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+
+                </div>
+
+            </div>
+            <!--Library-->
+            <div class="col-md-12 my-3">
+
+            </div>
+        </div>
+
+
+

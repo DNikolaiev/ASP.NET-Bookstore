@@ -1,0 +1,305 @@
+﻿@{
+    Layout = "~/Views/Shared/Standard_Layout.cshtml";
+   
+}
+@model BookStoreWeb.Models.Book
+
+
+<div class="container">
+    <div class="row my-5">
+        <div class="col-md-3">
+            <img src="~/Static/Images/@Model.ImgUrl">
+        </div>
+        <div class="col-md-9 p-3">
+            <div class="row text-left">
+                <div class="col-md-12 text-center">
+                    <h2>@Model.Title</h2>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        @Html.ActionLink("Update", "Update", new { id = Model.Id }, new { @class="btn btn-success", @style="float:right;"})
+                        <br />
+                    }
+                    <hr />
+                </div>
+
+                <div class="col-md-6 font-italic">
+                    Author: <a href="@Url.Action("Info","Author",new {author=Model.Author_Name_fk })">@Model.Author_Name_fk</a>
+                </div>
+                <div class="col-md-6 font-italic text-right ">
+                    Publisher: @Model.Publisher_Name_fk
+                </div>
+                <div class="col-md-6 font-italic">
+                    Genre: <a href="#">@Model.Genre</a>
+                </div>
+                <div class="col-md-6 font-italic text-right ">
+                    Language: @Model.Language
+                </div>
+                <div class="col-md-12 my-4">
+                    @Model.Description
+                </div>
+                <div class="col-md-12 ">
+                    <div class="row align-items-center justify-content-center">
+                        @for (int i = 0; i < Model.Rating; i++)
+                        {
+                            <div class="col-md-1">
+                                <img src="~/Static/Images/Star.png">
+                            </div>
+                        }
+
+                        @{ var difference = 5 - Model.Rating;}
+                        @if (difference > 0)
+                        {
+                            for (int i = 0; i < difference; i++)
+                            {
+                                <div class="col-md-1">
+                                    <img src="~/Static/Images/Star_Empty.png">
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-12 bg-light my-3 p-4">
+            <div class="row">
+
+                <div class="col-md-4 text-right ">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                    <span class="align-middle">Download it in your Library after purchase!</span>
+                    }
+                    else
+                    {
+                        <span class="align-middle">Login in order to purchase a book</span>
+                    }
+                </div>
+                <div class="col-md-4 text-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (!ViewBag.isPurchased)
+                        {
+                            @Html.ActionLink("Add to Cart", "AddToCart", "Order", new { book_id = Model.Id }, new { @class = "btn btn-success" })
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Download", "Profile", "Account", null, new { @class = "btn btn-success" })
+                        }
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-primary" })
+
+                    }
+                </div>
+                <div class="col-md-4 text-right">
+                    <p class="h3 align-middle"> $@Model.Price</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 my-3">
+            <p class="h5 align-middle">Comments</p>
+            <hr />
+        </div>
+
+        <div class="row py-2" id="test">
+            @if (Model.Comments != null)
+            {
+                foreach (var comment in Model.Comments)
+                {
+                    <div class="col-md-12 my-2">
+                        <div class="row">
+
+                            <div class="col-md-1 text-center">
+                                <img src="~/Static/Images/User.png" />
+                                <p>@comment.UserName</p>
+                            </div>
+                            <div class="col-md-8">
+                                @comment.Text
+                            </div>
+                            <div class="col-md-1 text-secondary">
+                                @comment.Date
+                            </div>
+                            <div class="col-md-2">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                        <button class="btn" type="button" onclick="UpvoteAsync(@comment.Id)" id="@comment.Id">
+                                            @if (comment.IsUpvotedByUser)
+                                            {
+                                                
+                                                <img src="~/Static/Images/Upvote.png" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/Static/Images/Upvote_neutral.png" />
+                                            }
+                                        </button>
+                                        }
+                                        @Html.Label("+"+comment.UpVotes.ToString(), new { @id="up_comment_"+comment.Id, @class="text-success"})
+                                        
+                                    </div>
+                                    <div class="col-md-5">
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                        <button class="btn " type="button" onclick="DownvoteAsync(@comment.Id)" id="@comment.Id">
+                                            @if (comment.IsDownvotedByUser)
+                                            {
+                                                <img src="~/Static/Images/Downvote.png" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/Static/Images/Downvote_neutral.png" />
+                                            }
+
+                                        </button>
+                                        }
+                                        @Html.Label("-"+comment.DownVotes.ToString(), new { @id = "down_comment_" + comment.Id, @class = "text-danger" })
+                                        
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                            <div class="col-md-12 text-right">
+                                @using (Html.BeginForm("DeleteComment", "Product", new { commentId = comment.Id, bookId = Model.Id }, FormMethod.Post))
+                                {
+                                    <button type="submit" class="btn bg-light">Delete</button>
+                                }
+
+                            </div>
+                            }
+                        </div>
+                        <hr />
+                    </div>
+
+                }
+
+            }
+            else
+            {
+                <p class="col-md-12 ">Nothing here yet. Be first to write a review!</p>
+            }
+
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        using (Html.BeginForm(routeValues: new { id = Model.Id }))
+        {
+
+            <div class="col-md-12 my-3">
+                <textarea class="form-control" rows="5" cols="100" name="commentText"></textarea>
+            </div>
+            <div class="col-md-12 text-right mb-5 mr-2">
+                <button type="submit" class="btn btn-primary col-md-2 my-3">Send</button>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-md-12 mb-5 text-center">
+            @Html.ActionLink("Login", "Login", "Account") <span>to write a review!</span>
+        </div>
+    }
+</div>
+@section Scripts{
+    <script>
+        
+        
+        async function UpvoteAsync(comment_id) {
+
+            const url = "/Product/Upvote?id=" + comment_id
+            console.log("URL: " + url)
+           
+            const data = {
+                id:comment_id
+            }
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }); 
+               
+                var server_response = await response.json();
+                console.log((server_response));
+                for (var k in server_response) {
+                   
+                       upvotes_number = console.log(server_response[k]);
+                    
+                   
+                }
+
+                var upvotes_number = parseInt(server_response["Upvotes"]);
+                var downvotes_number = parseInt(server_response["Downvotes"]);
+                console.log(upvotes_number, downvotes_number);
+                
+                var upvote = document.getElementById("up_comment_" + comment_id);
+                var downvote = document.getElementById("down_comment_" + comment_id);
+
+                upvote.innerHTML = "+" + upvotes_number;
+                downvote.innerHTML = "-" + downvotes_number;
+                 
+               
+                
+            }
+            catch (error) {
+                console.log("error");
+            }
+
+        }
+        async function DownvoteAsync(comment_id) {
+
+            const url = "/Product/Downvote?id=" + comment_id
+           
+            const data = {
+                id: comment_id
+            }
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+               
+
+                var server_response = await response.json();
+                console.log((server_response));
+                for (var k in server_response) {
+
+                    upvotes_number = console.log(server_response[k]);
+
+
+                }
+
+                var upvotes_number = parseInt(server_response["Upvotes"]);
+                var downvotes_number = parseInt(server_response["Downvotes"]);
+                console.log(upvotes_number, downvotes_number);
+
+                var upvote = document.getElementById("up_comment_" + comment_id);
+                var downvote = document.getElementById("down_comment_" + comment_id);
+
+                upvote.innerHTML = "+" + upvotes_number;
+                downvote.innerHTML = "-" + downvotes_number;
+               
+                
+            }
+            catch (error) {
+
+            }
+
+        }
+    </script>
+}
+
+
+
+

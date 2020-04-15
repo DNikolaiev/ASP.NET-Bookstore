@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewBag.Title = "";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/Content/indexStyles.css" type="text/css">
+</head>
+
+<body>
+    <!--header-->
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark ">
+            <a class="navbar-brand" href="#">Book Store</a>
+            <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
+                    aria-expanded="false" aria-label="Toggle navigation"></button>
+            <div class="collapse navbar-collapse " id="collapsibleNavId">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        @Html.ActionLink("Home", "Products", "Home", null, new { @class = "nav-link" })
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Bestsellers</a>
+                    </li>
+                    <li class="nav-item">
+
+                        <a class="nav-link" href="#">Contact</a>
+
+                    </li>
+
+                </ul>
+                <div class="col-md-1 text-right">
+                    <a href="/Order/Checkout">
+                        <img src="~/Static/Images/Cart.png" style="width:40%; " />
+                    </a>
+                </div>
+                <ul class="navbar-nav mr-5">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown ">
+
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownId">
+                                <a class=" text-dark text-center dropdown-item"><b>@User.Identity.Name</b></a>
+                                <a class="dropdown-item " href="@Url.Action("Profile","Account")">Library</a>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @Html.ActionLink("Cart", "Checkout", "Order", null, new { @class = "dropdown-item text-success" })
+                                    <hr />
+                                    @Html.ActionLink("Sign Out", "SignOut", "Account", null, new { @class = "dropdown-item" })
+                                }
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Login", "Login", "Account", null, new { @class = "nav-link" })
+                    }
+
+                </ul>
+                @using (Html.BeginForm("Search", "Home", FormMethod.Post, htmlAttributes: new { @class = "form-inline " }))
+                {
+
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" name="text">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+                }
+            </div>
+        </nav>
+    </header>
+   
+        @RenderBody()
+    
+    <button onclick="topFunction()" id="topBtn" title="Go to top">Top</button>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        topBtn = document.getElementById("topBtn");
+        window.onscroll = function () { scrollFunction() };
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                topBtn.style.display = "block";
+            } else {
+                topBtn.style.display = "none";
+            }
+        }
+        function topFunction() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    @RenderSection("Scripts",required:false)
+
+    <footer class="footer fixed-bottom">
+        <div class="container  text-center ">
+            <small>Copyright &copy; Dmitry Nikolaiev</small>
+        </div>
+    </footer>
+
+</body>
+</html>
+    
+
